@@ -1,9 +1,11 @@
 module View exposing (view)
 
-import Html exposing (Html, div, text, program)
-import Messages exposing (Msg(..))
-import Models exposing (Model)
-import Players.List 
+import Html exposing (Html, div, text)
+import Models exposing (Model, PlayerId)
+import Messages exposing (Msg)
+import Players.Edit
+import Players.List
+import RemoteData
 
 view : Model -> Html Msg
 view model =
@@ -12,4 +14,45 @@ view model =
 
 page : Model -> Html Msg
 page model =
-    Players.List.view model.players
+    case model.route of
+    Models.PlayersScreen ->
+        Players.List.view model.players
+    
+    Models.PlayerScreen id ->
+        playerEditPage model id
+
+    Models.ScreenNotFound ->
+        notFoundView
+
+
+playerEditPage : Model -> PlayerId -> Html Msg
+playerEditPage model playerId =
+    case model.players of
+        RemoteData.NotAsked ->
+            text ""
+        
+        RemoteData.Loading ->
+            text "Loading ..."
+
+        RemoteData.Failure err ->
+            text (toString err)
+
+        RemoteData.Success players ->
+            let 
+                maybePlayer = 
+                    players
+                        |> List.filter (\player -> player.id == playerId)
+                        |> List.head
+            in
+                case maybePlayer of
+                    Just player -> 
+                        Players.Edit.view player
+
+                    Nothing ->
+                        notFoundView
+
+notFoundView : Html msg
+notFoundView =
+    div []
+        [ text "Not found"
+        ]

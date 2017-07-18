@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node ./api.js"
+  },
   "dependencies": {
     "json-server": "0.9.5"
   }

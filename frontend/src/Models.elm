@@ -1,5 +1,7 @@
 module Models exposing (..)
 
+import RemoteData exposing (WebData)
+
 type alias PlayerId = String
 
 type alias Player =
@@ -8,9 +10,18 @@ type alias Player =
     , level: Int 
     }
 
-type alias Model = { players: List Player }
+type alias Model = 
+    { players: WebData (List Player)
+    , route : Route
+    }
 
-initialModel : Model
-initialModel =
-    { players = [Player "1"  "Sam" 1] }
+initialModel : Route -> Model
+initialModel route =
+    { players = RemoteData.Loading
+    , route = route
+    }
 
+type Route
+    = PlayersScreen
+    | PlayerScreen PlayerId
+    | ScreenNotFound
